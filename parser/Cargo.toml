@@ -4,3 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+miette = "7.5.0"
+phf = { version = "0.11.3", features = ["macros"] }
+thiserror = "2.0.12"
+
+[dev-dependencies]
+miette = { version = "7.5.0", features = ["fancy"] }
