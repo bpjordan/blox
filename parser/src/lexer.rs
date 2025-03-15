@@ -4,6 +4,8 @@ use miette::{Diagnostic, SourceOffset, SourceSpan};
 use phf::{Map, phf_map};
 use thiserror::Error;
 
+use crate::tokens::{Token, TokenKind};
+
 const KEYWORDS: Map<&'static str, TokenKind<'static>> = phf_map!(
     "and" => TokenKind::And,
     "class" => TokenKind::Class,
@@ -22,72 +24,6 @@ const KEYWORDS: Map<&'static str, TokenKind<'static>> = phf_map!(
     "var" => TokenKind::Var,
     "while" => TokenKind::While,
 );
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Token<'de> {
-    kind: TokenKind<'de>,
-    span: SourceSpan,
-}
-
-impl<'de> Token<'de> {
-    fn new(kind: TokenKind<'de>, span: impl Into<SourceSpan>) -> Self {
-        Self {
-            kind,
-            span: span.into(),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum TokenKind<'de> {
-    // Single-character tokens.
-    LeftParen,
-    RightParen,
-    LeftBrace,
-    RightBrace,
-    Comma,
-    Dot,
-    Minus,
-    Plus,
-    Semicolon,
-    Slash,
-    Star,
-
-    // One or two character tokens.
-    Bang,
-    BangEqual,
-    Equal,
-    EqualEqual,
-    Greater,
-    GreaterEqual,
-    Less,
-    LessEqual,
-
-    // Literals.
-    Identifier(&'de str),
-    String(Cow<'de, str>),
-    Number(u64, Option<u64>),
-
-    Comment(&'de str),
-
-    // Keywords.
-    And,
-    Class,
-    Else,
-    False,
-    Fun,
-    For,
-    If,
-    Nil,
-    Or,
-    Print,
-    Return,
-    Super,
-    This,
-    True,
-    Var,
-    While,
-}
 
 #[derive(Debug, Error, Diagnostic, PartialEq, Eq)]
 #[error("Failed to parse token: {kind}")]
