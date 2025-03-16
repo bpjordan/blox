@@ -6,6 +6,8 @@ use thiserror::Error;
 
 use crate::tokens::{Token, TokenKind};
 
+pub type Result<'de, T = Token<'de>, E = Error<'de>> = std::result::Result<T, E>;
+
 const KEYWORDS: Map<&'static str, TokenKind<'static>> = phf_map!(
     "and" => TokenKind::And,
     "class" => TokenKind::Class,
@@ -25,9 +27,9 @@ const KEYWORDS: Map<&'static str, TokenKind<'static>> = phf_map!(
     "while" => TokenKind::While,
 );
 
-#[derive(Debug, Error, Diagnostic, PartialEq, Eq)]
+#[derive(Debug, Clone, Error, Diagnostic, PartialEq, Eq)]
 #[error("Failed to parse token: {kind}")]
-pub struct LexError<'de> {
+pub struct Error<'de> {
     kind: LexErrorKind,
     #[source_code]
     src: &'de str,
@@ -35,7 +37,7 @@ pub struct LexError<'de> {
     span: SourceSpan,
 }
 
-#[derive(Debug, Error, PartialEq, Eq)]
+#[derive(Debug, Clone, Error, PartialEq, Eq)]
 pub enum LexErrorKind {
     #[error("Unexpected character {0}")]
     UnexpectedChar(char),
@@ -62,7 +64,7 @@ impl<'de> Lexer<'de> {
 }
 
 impl<'de> Iterator for Lexer<'de> {
-    type Item = Result<Token<'de>, LexError<'de>>;
+    type Item = Result<'de>;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -109,8 +111,8 @@ impl<'de> Lexer<'de> {
         iter.next().map(|(_, c)| c)
     }
 
-    fn make_error(&self, kind: LexErrorKind, start_idx: usize) -> LexError<'de> {
-        LexError {
+    fn make_error(&self, kind: LexErrorKind, start_idx: usize) -> Error<'de> {
+        Error {
             kind,
             src: &self.src,
             span: SourceSpan::new(

@@ -5,3 +5,7 @@ members = [
     "cli",
     "parser"
 ]
+
+[workspace.dependencies]
+blox-cli = {path = "./cli"}
+blox-parser = {path = "./parser"}
